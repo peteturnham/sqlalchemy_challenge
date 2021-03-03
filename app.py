@@ -1,29 +1,86 @@
-from flask import Flask, jsonify, request
 import numpy as np
 
 import sqlalchemy
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine, func
-#############################
-# Flask set up
-#############################
 
-app = Flask(__name__)
-#app version
-api_version = "v1.0"
+from flask import Flask, jsonify
 
-#############################
+
+#################################################
 # Database Setup
+#################################################
 engine = create_engine("sqlite:///resources/hawaii.sqlite")
-# Reflect an existing database into a new model
+
+# reflect an existing database into a new model
 Base = automap_base()
-# Reflect the tables from the database
-Base.prepare(engine, reflect= True)
+# reflect the tables
+Base.prepare(engine, reflect=True)
 
-# Save reference to table
-data = Base.classes.hawaii
+# Save reference to the table
+measurement= Base.classes.measurement
+stations = Base.classes.station
+
+#################################################
+# Flask Setup
+#################################################
+app = Flask(__name__)
 
 
-#############################
-# 
+#################################################
+# Flask Routes
+#################################################
+
+@app.route("/")
+def welcome():
+    """List all available api routes."""
+    return (
+        f"Available Routes:<br/>"
+        f"/api/v1.0/measurements<br/>"
+        f"/api/v1.0/stations"
+    )
+
+
+@app.route("/api/v1.0/measurements")
+def names():
+    # Create our session (link) from Python to the DB
+    session = Session(engine)
+
+    """Return a list of all passenger names"""
+    # Query all passengers
+    results = session.query(measurement.station, measurement.prcp).all()
+
+    session.close()
+
+    # Convert list of tuples into normal list
+    all_data = list(np.ravel(results))
+
+    return jsonify(all_data)
+
+
+# @app.route("/api/v1.0/passengers")
+# def passengers():
+#     # Create our session (link) from Python to the DB
+#     session = Session(engine)
+
+#     """Return a list of passenger data including the name, age, and sex of each passenger"""
+#     # Query all passengers
+#     results = session.query(Passenger.name, Passenger.age, Passenger.sex).all()
+
+#     session.close()
+
+#     # Create a dictionary from the row data and append to a list of all_passengers
+#     all_passengers = []
+#     for name, age, sex in results:
+#         passenger_dict = {}
+#         passenger_dict["name"] = name
+#         passenger_dict["age"] = age
+#         passenger_dict["sex"] = sex
+#         all_passengers.append(passenger_dict)
+
+#     return jsonify(all_passengers)
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
