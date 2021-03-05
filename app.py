@@ -1,10 +1,3 @@
-
-
-
-
-
-
-
 ##############################################
 ##############################################
 #####Package for Flask Web Deployment
@@ -71,7 +64,7 @@ def welcome_page():
   <li><a href="{base_p}tobs">tobs - {api_p}tobs</a></li>
   <li><a href="{base_p}start">start - {api_p}start</a></li>
   <li>start - {api_p}start date(Y-M-D)</li>
-  <li>start and end - {api_p}[start]/[end]</li>
+  <li>start and end - {api_p}start date(Y-M-D)/end date(Y-M-D)</li>
 </ul>
 </body>
 </html>'''
@@ -155,7 +148,9 @@ def tobs():
     the_goods=jsonify (all_tobs)
     return (the_goods)
 
-
+@app.route("/api/v1.0/start")
+def display():
+    return(f"To use this page, type in your desired query date in the format of 'Year-Month-Day'" )
 
 #################################################
 #   Path for start date input
